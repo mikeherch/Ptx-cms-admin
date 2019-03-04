@@ -1,0 +1,11 @@
+\check Show Projects HTML
+\submenu PBT
+\script mbhPtxProjects.py
+\description Shows list of all projects, including name, type, language, and users.
+\noText
+\toHtml
+\utf8
+\optionName OptionProjectsExpanded
+\optionLocalizedName Open with Projects expanded
+\optionDescription Enter "Y" to open with projects expanded, or "N" to open with projects collapsed.
+\optionDefault N
