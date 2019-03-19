@@ -73,7 +73,10 @@ def buildHtmlProjHeader(proj):
     html += proj.type
     if proj.basedOn:
         baseProject = PSys.project(proj.basedOn)
-        html += (' based on ' + buildHtmlNameAndLang(baseProject))
+        if baseProject:
+            html += (' based on ' + buildHtmlNameAndLang(baseProject))
+        else:
+            html += (' based on <b>' + proj.basedOn + '</b>')
     return html
     
 def buildHtmlNameAndLang(proj):
