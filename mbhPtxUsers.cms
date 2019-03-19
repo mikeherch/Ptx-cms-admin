@@ -1,5 +1,5 @@
 \check Show Project Users HTML
-\submenu PBT
+\submenu Admin
 \script mbhPtxUsers.py
 \description Shows a table of projects and users.
 \noText

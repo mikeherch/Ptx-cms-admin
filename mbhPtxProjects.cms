@@ -1,5 +1,5 @@
 \check Show Projects HTML
-\submenu PBT
+\submenu Admin
 \script mbhPtxProjects.py
 \description Shows list of all projects, including name, type, language, and users.
 \noText
