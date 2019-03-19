@@ -1,0 +1,31 @@
+\check Show Project Users HTML
+\submenu PBT
+\script mbhPtxUsers.py
+\description Shows a table of projects and users.
+\noText
+\toHtml
+\utf8
+\optionName OptionIncludeUsers
+\optionLocalizedName Users to include
+\optionDescription Either enter a list of user names to show, separated by commas, or leave blank to show all users.
+\optionDefault 
+
+\optionName OptionExcludeUsers
+\optionLocalizedName Users to exclude
+\optionDescription Enter a list of user names to exclude, separated by commas.
+\optionDefault 
+
+\optionName OptionIncludeProjects
+\optionLocalizedName Projects to include
+\optionDescription Either enter a list of project names to show, separated by commas, or leave blank to show all projects.
+\optionDefault 
+
+\optionName OptionExcludeProjects
+\optionLocalizedName Projects to exclude
+\optionDescription Enter a list of user names to exclude, separated by commas.
+\optionDefault 
+
+\optionName OptionListSeparator
+\optionLocalizedName Character to separate lists
+\optionDescription Enter a single character to be used instead of a comma to separate names in the other options.
+\optionDefault ,

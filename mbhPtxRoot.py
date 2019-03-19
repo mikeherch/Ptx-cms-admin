@@ -516,17 +516,17 @@ class XMLParser:
         
             
         
-def getXmlRootElement(path):
-#     path2 = r"C:\My Paratext 8 Projects\abc\settings.xml"
-    tree = ET.parse(path)
-    root = tree.getroot()
-#     strEncoding = 'utf_8_sig'
-#     aFile = codecs.open(path2, 'r', strEncoding)
-#     strText = aFile.read()
-#     aFile.close()
-#     aParser = ET.XMLParser(encoding='UTF-8')
-#     root = ET.fromstring(strText.encode('utf-8'))
-    return root
+# def getXmlRootElement(path):
+# #     path2 = r"C:\My Paratext 8 Projects\abc\settings.xml"
+#     tree = ET.parse(path)
+#     root = tree.getroot()
+# #     strEncoding = 'utf_8_sig'
+# #     aFile = codecs.open(path2, 'r', strEncoding)
+# #     strText = aFile.read()
+# #     aFile.close()
+# #     aParser = ET.XMLParser(encoding='UTF-8')
+# #     root = ET.fromstring(strText.encode('utf-8'))
+#     return root
 
 def settingsDirectory():
     """ Find the directory with Paratext 8 projects using the Windows registry """
