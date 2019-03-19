@@ -1,0 +1,33 @@
+\check Show Project Plan Html
+\submenu Admin
+\script mbhPtxPlanHtml.py
+\description Display in web browswer the contents of a Base Plan or the Project Plan of a given project. Click on Options to choose either a base Plan or the Progress Plan for a project. 
+\noText
+\toHtml
+\utf8
+\helpFile mbhProjPlanHtml.rtf
+
+\optionName OptionBasePlan
+\optionLocalizedName Name of a Base Plan
+\optionDescription Type in the name (or part of a name) of a Base Plan. If you want to show the Project Plan of a project, leave this box blank.
+\optionDefault
+
+\optionName OptionChecks
+\optionLocalizedName Show Checks
+\optionDescription Choose what checks to show. Type "all" to show all checks, "new" to show just the new checks for each stage, or "none" to show no checks.
+\optionDefault new
+
+\optionName OptionLanguage
+\optionLocalizedName Preferred Language
+\optionDescription Enter the code for the preferred language for names and description. Type "en" for English, "fr" for French, "es" for Spanish, "pt" for Portuguese, or "zh-Hans" for Chinese.
+\optionDefault en
+
+\optionName OptionStagesExpanded
+\optionLocalizedName Open with stages expanded
+\optionDescription Enter "Y" to open with stages expanded, or "N" to open with stages collapsed
+\optionDefault Y
+
+\optionName OptionTasksExpanded
+\optionLocalizedName Open with tasks expanded
+\optionDescription Enter "Y" to open with tasks expanded, or "N" to open with tasks collapsed
+\optionDefault N
