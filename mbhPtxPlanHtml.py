@@ -11,8 +11,8 @@ import codecs
 if __name__=="__main__":
     SettingsDirectory = "C:\\My Paratext 8 Projects\\"
     Project = "zzPbtPln"
-    OptionBasePlan = '' # name of base plan to search from, form GUI options
-    OptionLanguage = 'en'
+    OptionBasePlan = 'SIL' # name of base plan to search from, form GUI options
+    OptionLanguage = 'fr'
     OptionStagesExpanded = 'y'
     OptionTasksExpanded = 'n'
     OptionChecks = 'none'
@@ -264,6 +264,7 @@ htmlHeader = """
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
+<meta charset="utf-8">
 <title>Project Plan</title>
 """
 htmlStyle = """

@@ -106,7 +106,7 @@ def main():
             for user in project.users():
                 if user.name in setAllUsers:
                     iCol = dictUserColumns[user.name]
-                    listRow[iCol] = user.role
+                    listRow[iCol] = rolename(user.role)
             array.append(listRow)
     
     # Flip array here
@@ -148,11 +148,26 @@ def main():
 
     writeout("</tbody></table>\n")
     writeout(htmlClose)
+
+def rolename(strRole):
+    aDict = {
+        'Administrator': 'Administrator',
+        'Consultant': 'Consultant',
+        'None': '',
+        'Observer': 'Observer',
+        'Translator': 'Translator',
+        'TeamMember': 'Translator'
+    }
+    if strRole in aDict:
+        return aDict[strRole]
+    else:
+        return strRole
     
 htmlHeader = """
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
+<meta charset="utf-8">
 <title>Paratext Projects</title>
 """
 htmlStyle = """
