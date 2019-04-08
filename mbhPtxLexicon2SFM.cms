@@ -1,0 +1,11 @@
+\check Lexicon Export as SFM
+\submenu Admin
+\script mbhPtxLexicon2SFM.py
+\description Shows a report with the interlinear lexicon rendered as SFM (MDF).
+\noText
+\toText
+\utf8
+\optionName optionMorphemeFilter
+\optionLocalizedName Filter by morpheme type
+\optionDescription Enter a list of morpheme types that you want to appear in the report. Possible types are: Word, Phrase, Stem, Prefix, Suffix. If the field is left blank, all morpheme types will be output.
+\optionDefault Word
