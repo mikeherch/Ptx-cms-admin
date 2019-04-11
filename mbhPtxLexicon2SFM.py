@@ -7,13 +7,14 @@ import mbhPtxRoot
 import codecs
 import sys
 import os.path
+from mbhPtxRoot import ParseAttrsError
 
 if __name__=="__main__":
     SettingsDirectory = "C:\\My Paratext 8 Projects\\"
-    Project = "zzAkgUni"
+    Project = "AplUni"
     OutputFile = SettingsDirectory + "cms\\checktext.txt"
     Encoding = "65001"
-    optionMorphemeFilter = 'Word'
+    optionMorphemeFilter = 'Word Stem'
     
 g_LexFileName = 'Lexicon.xml'  
 g_setMorphs = set()
@@ -36,15 +37,22 @@ def main():
                 strMorphType = strLang = strGloss = ''
                 strToken, enumType = P.tokens.next() # should be attrs
                 if enumType == P.ATTRS:
-                    dictAttrs = P.parseAttrs(strToken)
-                    strMorphType = dictAttrs['Type']
-                    g_setMorphs.add(strMorphType)
-                    strForm = dictAttrs['Form']
-                    if passesFilter(strMorphType):
-                        writeout("\\lx %s\n" % strForm)
-                        writeout("\\ps %s\n" % strMorphType)
-                    else:
+                    if "hav/" in strToken:
+                        pass
+                    try:
+                        dictAttrs = P.parseAttrs(strToken)
+                    except ParseAttrsError as err:
+                        say("Unable to parse: %s\n" % strToken)
                         P.parseSkipUntil('item', P.END)
+                    else:
+                        strMorphType = dictAttrs['Type']
+                        g_setMorphs.add(strMorphType)
+                        strForm = dictAttrs['Form']
+                        if passesFilter(strMorphType):
+                            writeout("\\lx %s\n" % strForm)
+                            writeout("\\ps %s\n" % strMorphType)
+                        else:
+                            P.parseSkipUntil('item', P.END)
                 else:
                     say("Expected attributes at\n%s" % P.strLine)
                     P.parseSkipUntil('item', P.END)
@@ -56,8 +64,13 @@ def main():
             elif strTag == 'Gloss':
                 strToken, enumType = P.tokens.next() # should be attrs
                 if enumType == P.ATTRS:
-                    dictAttrs = P.parseAttrs(strToken)
-                    strLang = dictAttrs['Language']
+                    try:
+                        dictAttrs = P.parseAttrs(strToken)
+                    except ParseAttrsError as err:
+                        say("Unable to parse: %s\n" % strToken)
+                        strLang = "???"
+                    else:
+                        strLang = dictAttrs['Language']
                     strToken, enumType = P.tokens.next() # should be CDATA
                     if enumType == P.CDATA:
                         strGloss = strToken

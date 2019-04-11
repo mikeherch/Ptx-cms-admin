@@ -7,7 +7,7 @@ Created on Feb 20, 2019
 import sys
 import os
 import codecs
-import xml.etree.ElementTree as ET
+# import xml.etree.ElementTree as ET
 
 
 g_settingsDirectory = ''
@@ -210,7 +210,8 @@ class XMLParser:
         self.blnIgnoreProc = blnIgnoreProc
        
         self.strLine = self.fileXML.readline()
-        self.ungottenchar = ''
+#         self.ungottenchar = ''
+        self.ungottenchars = ''
         self.indexChar = 0
         
 #     def __getattr__(self, name):
@@ -242,7 +243,7 @@ class XMLParser:
             elif c == '<':
                 c = self.getchar()
                 if c == '': yield '', self.EOF
-                elif c == '/':
+                elif c == '/':      # check for end tag
                     enumTokenType = self.END
                     strTagName = self.getUpToAny('>')
                     c = self.getchar()  # consume the '>'
@@ -268,7 +269,10 @@ class XMLParser:
                             if not self.peekchar() in '/>':
                                 enumTokenType = self.ATTRS
                                 # The following fails if an attribute value includes either '/' or '>'
-                                strAttrs = self.getUpToAny('/>')
+                                strAttrs = self.getUpToAny('>')
+                                if strAttrs[-1] == '/':
+                                    self.ungetchar('/') # this part of an empty tag marker
+                                    strAttrs = strAttrs[0:-1]
                                 strAttrs = strAttrs.strip()
                                 if strAttrs:
                                     yield strAttrs, enumTokenType
@@ -319,12 +323,12 @@ class XMLParser:
             
     def getchar(self):
         """Get the next character from self.fileXML. If a character was
-        saved by ungetchar() return the ungottenchar instead.
+        saved by ungetchar() return the first ungottenchars instead.
         Do not CR or LF.
         """
-        if self.ungottenchar:
-            c = self.ungottenchar
-            self.ungottenchar = ''
+        if self.ungottenchars:
+            c = self.ungottenchars[0]
+            self.ungottenchars = self.ungottenchars[1:]
             return c
         elif self.strLine:
             if self.indexChar >= len(self.strLine): # reached EOL
@@ -343,7 +347,9 @@ class XMLParser:
             return ''
         
     def ungetchar(self, c):
-        self.ungottenchar = c
+        """ insert c at the beginning of string of ungottenchars
+        """
+        self.ungottenchars = c + self.ungottenchars
         
     def peekchar(self):
         c = self.getchar()
@@ -491,10 +497,12 @@ class XMLParser:
             strToken, enumType = self.tokens.next() # presumably an end tag
             return strCdata
 
-    def parseAttrs(self, attrs, aDict=None):
+    def parseAttrs(self, attrs, aDict=None, depth=1):
         """Parse the string attrs and place each attribute/value pair into a 
         dictionary. Return the dictionary.
         """
+        if depth > 10:
+            raise ParseAttrsError 
         dictAttrs = aDict if aDict else dict()
         if not attrs:
             return dictAttrs
@@ -509,24 +517,15 @@ class XMLParser:
         dictAttrs[strName] = strValue
         strRestOfAttrs = attrs[iQuot2+1:].strip()
         if strRestOfAttrs:
-            return self.parseAttrs(strRestOfAttrs, dictAttrs)
+            return self.parseAttrs(strRestOfAttrs, dictAttrs, depth + 1)
         else:
             return dictAttrs
         
         
             
         
-# def getXmlRootElement(path):
-# #     path2 = r"C:\My Paratext 8 Projects\abc\settings.xml"
-#     tree = ET.parse(path)
-#     root = tree.getroot()
-# #     strEncoding = 'utf_8_sig'
-# #     aFile = codecs.open(path2, 'r', strEncoding)
-# #     strText = aFile.read()
-# #     aFile.close()
-# #     aParser = ET.XMLParser(encoding='UTF-8')
-# #     root = ET.fromstring(strText.encode('utf-8'))
-#     return root
+class ParseAttrsError(Exception):
+    pass
 
 def settingsDirectory():
     """ Find the directory with Paratext 8 projects using the Windows registry """
