@@ -253,9 +253,12 @@ def paddedPhrase(strPhrase, intWidth):
         intPadding = 1
     return strPhrase + (' ' * int(intPadding * 1.3))
     
-    
 def asPCDATA(aStr):
-    return(aStr)
+    s1 = aStr.replace('&', '&amp;')
+    s2 = s1.replace('<', '&lt;')
+    s3 = s2.replace('>', '&gt;')
+    s4 = s3.replace('"', '&quot;')
+    return(s4)
 
 def asBool(aStr):
     return aStr.upper() in ['Y', 'YES' 'T', 'TRUE']
