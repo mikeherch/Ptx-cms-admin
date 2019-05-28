@@ -1,7 +1,7 @@
 '''
 Created on April 11, 2018
 
-@author: MikeH
+@author: Mihe Herchenroeder
 '''
 import mbhPtxPlanImport
 import sys

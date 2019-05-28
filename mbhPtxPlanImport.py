@@ -1,10 +1,9 @@
 '''
-Created on Oct 20, 2017
-
-@author: MikeH
+@author: Mike Herchenroeder
 '''
 import os.path
 import codecs
+from mbhPtxRoot import XMLParser
 
 class Task:
     def __init__(self):
@@ -18,43 +17,43 @@ class Task:
         self.moderateBooksVPD = 1000
         self.difficultBooksVPD = 1000
         
-    def parseTask(self, aPlan):
+    def parseTask(self, aPlan, parser):
         """Parse input up thru </Task> and store results in self.
         """
         while True:
-            strToken, enumType = aPlan.tokens.next()
-            if enumType == aPlan.EOF:
+            strToken, enumType = parser.tokens.next()
+            if enumType == parser.EOF:
                 break;
-            elif enumType == aPlan.ATTRS:
+            elif enumType == parser.ATTRS:
                 pass    #ignore attrs
-            elif (strToken, enumType) == ('Names',aPlan.BEGIN):
-                s = aPlan.parseEncodedText('Names', aPlan.language)
+            elif (strToken, enumType) == ('Names',parser.BEGIN):
+                s = aPlan.parseEncodedText(parser, 'Names', aPlan.language)
                 self.name = s
-            elif (strToken, enumType) == ('Type',aPlan.BEGIN):
-                s = aPlan.parseGetCData()
+            elif (strToken, enumType) == ('Type',parser.BEGIN):
+                s = parser.parseGetCData()
                 self.type = s
-            elif (strToken, enumType) == ('EasiestBooksVPD',aPlan.BEGIN):
-                s = aPlan.parseGetCData()
+            elif (strToken, enumType) == ('EasiestBooksVPD',parser.BEGIN):
+                s = parser.parseGetCData()
                 self.easiestBooksVPD = s
-            elif (strToken, enumType) == ('EasyBooksVPD',aPlan.BEGIN):
-                s = aPlan.parseGetCData()
+            elif (strToken, enumType) == ('EasyBooksVPD',parser.BEGIN):
+                s = parser.parseGetCData()
                 self.easyBooksVPD = s
-            elif (strToken, enumType) == ('ModerateBooksVPD',aPlan.BEGIN):
-                s = aPlan.parseGetCData()
+            elif (strToken, enumType) == ('ModerateBooksVPD',parser.BEGIN):
+                s = parser.parseGetCData()
                 self.moderateBooksVPD = s
-            elif (strToken, enumType) == ('DifficultBooksVPD',aPlan.BEGIN):
-                s = aPlan.parseGetCData()
+            elif (strToken, enumType) == ('DifficultBooksVPD',parser.BEGIN):
+                s = parser.parseGetCData()
                 self.difficultBooksVPD = s
-            elif (strToken, enumType) == ('Availability',aPlan.BEGIN):
-                s = aPlan.parseGetCData()
+            elif (strToken, enumType) == ('Availability',parser.BEGIN):
+                s = parser.parseGetCData()
                 self.availability = s
-            elif (strToken, enumType) == ('EditingRequired',aPlan.BEGIN):
+            elif (strToken, enumType) == ('EditingRequired',parser.BEGIN):
                 self.availability = 'Yes'
-                aPlan.parseSkipUntil('EditingRequired', aPlan.END)
-            elif (strToken, enumType) == ('Descriptions',aPlan.BEGIN):
-                s = aPlan.parseEncodedText('Descriptions', aPlan.language)
+                parser.parseSkipUntil('EditingRequired', parser.END)
+            elif (strToken, enumType) == ('Descriptions',parser.BEGIN):
+                s = aPlan.parseEncodedText(parser, 'Descriptions', aPlan.language)
                 self.description = s
-            elif (strToken, enumType) == ('Task',aPlan.END):
+            elif (strToken, enumType) == ('Task',parser.END):
                 break
         
 class Check:
@@ -96,22 +95,22 @@ class Check:
         if name == "availability": return 'Auto'            
         raise NameError, name
         
-    def parseCheck(self, aPlan):
+    def parseCheck(self, parser):
         while True:
-            strToken, enumType = aPlan.tokens.next()
-            if enumType == aPlan.EOF:
+            strToken, enumType = parser.tokens.next()
+            if enumType == parser.EOF:
                 break;
-            elif enumType == aPlan.ATTRS:
+            elif enumType == parser.ATTRS:
                 pass    # ignore attrs
-            elif (strToken, enumType) == ('BasicCheckType', aPlan.BEGIN):
-                self.basicCheckType = aPlan.parseGetCData()
-            elif (strToken, enumType) == ('Type', aPlan.BEGIN):
-                self.type = aPlan.parseGetCData()
-            elif (strToken, enumType) == ('AutoGrantEditRights', aPlan.BEGIN):
-                self.autoGrantEditRights = aPlan.parseGetCData()
-            elif (strToken, enumType) == ('Details', aPlan.BEGIN):
-                self.details = aPlan.parseGetCData()
-            elif (strToken, enumType) == ('Check', aPlan.END):
+            elif (strToken, enumType) == ('BasicCheckType', parser.BEGIN):
+                self.basicCheckType = parser.parseGetCData()
+            elif (strToken, enumType) == ('Type', parser.BEGIN):
+                self.type = parser.parseGetCData()
+            elif (strToken, enumType) == ('AutoGrantEditRights', parser.BEGIN):
+                self.autoGrantEditRights = parser.parseGetCData()
+            elif (strToken, enumType) == ('Details', parser.BEGIN):
+                self.details = parser.parseGetCData()
+            elif (strToken, enumType) == ('Check', parser.END):
                 break
         return
     
@@ -135,28 +134,28 @@ class Stage:
         self.biblicalTermsChecks = []   # list of check names
         self.backTranslationChecks = [] # list of check names
 
-    def parseStage(self, aPlan):
+    def parseStage(self, aPlan, parser):
         """Parses from line after <Stage> thru </Stage> and stores values of a
         names, descriptions, list of tasks, list of checks.
         """
         while True:
-            strToken, enumType = aPlan.tokens.next()
-            if enumType == aPlan.EOF:   #EOF, shouldn't happen
+            strToken, enumType = parser.tokens.next()
+            if enumType == parser.EOF:   #EOF, shouldn't happen
                 break;
-            elif enumType == aPlan.ATTRS:
+            elif enumType == parser.ATTRS:
                 pass    # ignore attrs
-            elif (strToken, enumType) == ('Task', aPlan.BEGIN):
+            elif (strToken, enumType) == ('Task', parser.BEGIN):
                 aTask = Task()
-                aTask.parseTask(aPlan) # up thru </Task>
+                aTask.parseTask(aPlan, parser) # up thru </Task>
                 self.tasks.append(aTask)
-            elif (strToken, enumType) == ('Check', aPlan.BEGIN):
-                aCheck = aPlan.parseCheck()
+            elif (strToken, enumType) == ('Check', parser.BEGIN):
+                aCheck = aPlan.parseCheck(parser)
                 self.checks.append(aCheck)
-            elif (strToken, enumType) == ('Names', aPlan.BEGIN):
-                self.name = aPlan.parseEncodedText('Names', aPlan.language) # up thru </Names>
-            elif (strToken, enumType) == ('Descriptions', aPlan.BEGIN):
-                self.description = aPlan.parseEncodedText('Descriptions', aPlan.language) # up thru </Descriptions>
-            elif (strToken, enumType) == ('Stage', aPlan.END):
+            elif (strToken, enumType) == ('Names', parser.BEGIN):
+                self.name = aPlan.parseEncodedText(parser, 'Names', aPlan.language) # up thru </Names>
+            elif (strToken, enumType) == ('Descriptions', parser.BEGIN):
+                self.description = aPlan.parseEncodedText(parser, 'Descriptions', aPlan.language) # up thru </Descriptions>
+            elif (strToken, enumType) == ('Stage', parser.END):
                 break
     
     def summarizeChecks(self):
@@ -178,20 +177,13 @@ class Stage:
                 self.biblicalTermsChecks.append(aCheck.name)
             
 class ProjectPlan:
-    # XML token types
-    EOF = 0
-    BEGIN = 1
-    END = 2
-    CDATA = 3
-    ATTRS = 4
-    UNDEF = 5
-    
+
     def __init__(self, strName, strFilePath, strLang = 'en'):
         self.name = strName
         self.basePlanName = ''
         self.path = strFilePath
         self.filePlan = codecs.open(strFilePath,'r', 'utf-8')
-        self.tokens = self.xmlTokens()
+#         self.tokens = self.xmlTokens()
         self.listStages = []
         self.language = strLang
         self.AllLanguages = set()
@@ -200,13 +192,6 @@ class ProjectPlan:
         self.ungottenchar = ''
         self.indexChar = 0
         
-#     def __getattr__(self, name):
-#         if name == "name": return self.name
-#         if name == "path": return self.path
-#         if name == "language": return self.language
-#         if name == "stages": return self.listStages
-#         raise NameError, name
-
     def __repr__(self):
         return '%s, stages:%i, @%s' % (self.name, len(self.listStages),self.path)
     
@@ -214,149 +199,10 @@ class ProjectPlan:
         if not self.filePlan.closed:
             self.filePlan.close()
     
-    def xmlTokens(self):
-        """A generator that reads self.filePlan and yields a sequence of  
-        2-tuples consisting of an XML token and they type of token. 
-        Yield '' on EOF. Subsequent function calls after EOF will continue to yield ''.
-        """
-        while(True):
-            enumTokenType = self.UNDEF
-            c = self.getchar()
-            # skip all whites space
-            while c <= " ":  # some kind of whitespace or control character
-                if c == '': 
-                    yield '', self.EOF
-                    break
-                else:
-                    c = self.getchar()
-            if c == '': yield '', self.EOF
-            elif c == '<':
-                c = self.getchar()
-                if c == '': yield '', self.EOF
-                elif c == '/':
-                    enumTokenType = self.END
-                    strTagName = self.getUpToAny('>')
-                    c = self.getchar()  # consume the '>'
-                    yield strTagName, enumTokenType
-                else:
-                    enumTokenType = self.BEGIN
-                    strTagName = c  #first letter of tag name
-                    while True:
-                        c = self.getchar()
-                        if c == ' ':
-                            yield strTagName, enumTokenType # begin tag
-                            if not self.peekchar() in '/>':
-                                enumTokenType = self.ATTRS
-                                strAttrs = self.getUpToAny('/>')
-                                strAttrs = strAttrs.strip()
-                                if strAttrs:
-                                    yield strAttrs, enumTokenType
-
-                            c = self.getchar()
-                            if c == '>': #close begin tag
-                                break
-                            elif c == '/':
-                                c = self.getchar()
-                                if c == '>':    #Empty tag, return implied end tag
-                                    yield strTagName, self.END
-                                break
-                            else: break # might be EOF
-                                
-                        elif c == '>':
-                            yield strTagName, enumTokenType
-                            break
-                        elif c == '/': # looks like an empty tag
-                            yield strTagName, enumTokenType
-                            c = self.getchar()  # should be '>'
-                            if c == '>':
-                                yield strTagName, self.END # yield implied end tag
-                        elif c == '': 
-                            yield '', self.EOF
-                            break
-                        else:
-                            strTagName += c
-                    
-            else:
-                enumTokenType = self.CDATA
-                strData = ''
-                while True:
-                    if c == '<':
-                        yield strData, enumTokenType
-                        self.ungetchar(c)
-                        break
-                    elif c == '&':
-                        strData += self.getEntity()
-                    elif c == '':
-                        yield strData, enumTokenType
-                        break
-                    else:
-                        strData += c
-                    c = self.getchar()
-    
-        while True:
-            yield '', self.EOF   # Keep yielding EOF 
-    def getchar(self):
-        """Get the next character from self.filePlan. If a character was
-        saved by ungetchar() return the ungottenchar instead.
-        Do not CR or LF.
-        """
-        if self.ungottenchar:
-            c = self.ungottenchar
-            self.ungottenchar = ''
-            return c
-        elif self.strLine:
-            if self.indexChar >= len(self.strLine): # reached EOL
-                self.strLine = self.filePlan.readline()
-                self.indexChar = 0
-                return self.getchar()
-            else:
-                c = self.strLine[self.indexChar]
-                if c in '\r\n':
-                    self.indexChar = len(self.strLine) # EOL, skip cr lf
-                    return self.getchar()   # return char on next line
-                else:
-                    self.indexChar += 1
-                    return c
-        else: # EOF
-            return ''
-        
-    def ungetchar(self, c):
-        self.ungottenchar = c
-        
-    def peekchar(self):
-        c = self.getchar()
-        self.ungetchar(c)
-        return c
-    
-    def getUpToAny(self,strEnd):
-        """Reads characters from file until any character in strEnd is read.
-        The read string is returned. The end character is put back using 
-        ungetchar()
-        """
-        s = ''
-        c = self.getchar()
-        while c not in strEnd:
-            s += c
-            c = self.getchar()
-        self.ungetchar(c)
-        return s
-    
-    def getEntity(self):
-        """Input and parse XML Character entity, returning interpreted character.
-        Assume '&' has already been read.
-        """
-        strEntity = self.getUpToAny(';')
-        dictEntities = {
-            'apos': "'", 'amp':'&', 'gt':'>', 'lt':'<', 'quot':'"'}
-        if strEntity in dictEntities:
-            self.getchar()  #consume ';'
-            return dictEntities[strEntity]
-        else:
-            return '&' + strEntity + ';'
     def stages(self):
         return self.listStages
             
-    def parseEncodedText(self, strTagName, strLanguage='en'):
+    def parseEncodedText(self, parser, strTagName, strLanguage='en'):
         """ Each encoded text consists of a sequence of <item> elements.
         Each <item> element contains a pair of <string>elements. The first 
         string contains a language code, and the second the text. Return the 
@@ -366,41 +212,41 @@ class ProjectPlan:
         strEnglishText = ''
         strPreferredText = ''
         while True:
-            strToken, enumType = self.tokens.next()
-            if (strToken, enumType) == (strTagName, self.END):
+            strToken, enumType = parser.tokens.next()
+            if (strToken, enumType) == (strTagName, parser.END):
                 if strPreferredText:
                     return strPreferredText
                 else:
                     return strEnglishText
-            elif (strToken, enumType) == ('item', self.END):
+            elif (strToken, enumType) == ('item', parser.END):
                 pass
-            elif (strToken, enumType) == ('item', self.BEGIN):
+            elif (strToken, enumType) == ('item', parser.BEGIN):
                 # Found <item> tag, read 2 <string> elements
                 strText = ''
                 strLang = ''
-                strToken, enumType = self.tokens.next()
-                if (strToken, enumType) == ('string', self.BEGIN):
+                strToken, enumType = parser.tokens.next()
+                if (strToken, enumType) == ('string', parser.BEGIN):
                     # get language from first string element'
-                    strToken, enumType = self.tokens.next()
-                    if (strToken, enumType) == ('string', self.END):
+                    strToken, enumType = parser.tokens.next()
+                    if (strToken, enumType) == ('string', parser.END):
                         strLang = ''
-                    elif enumType == self.CDATA:
+                    elif enumType == parser.CDATA:
                         strLang = strToken
-                        strToken, enumType = self.tokens.next()
-                        if (strToken, enumType) != ('string', self.END):
+                        strToken, enumType = parser.tokens.next()
+                        if (strToken, enumType) != ('string', parser.END):
                             break
                     else:
                         break
                     # get text from second string
-                    strToken, enumType = self.tokens.next()
-                    if (strToken, enumType) == ('string', self.BEGIN):
-                        strToken, enumType = self.tokens.next()
-                        if (strToken, enumType) == ('string', self.END):
+                    strToken, enumType = parser.tokens.next()
+                    if (strToken, enumType) == ('string', parser.BEGIN):
+                        strToken, enumType = parser.tokens.next()
+                        if (strToken, enumType) == ('string', parser.END):
                             strText = ''
-                        elif enumType == self.CDATA:
+                        elif enumType == parser.CDATA:
                             strText = strToken
-                            strToken, enumType = self.tokens.next()
-                            if (strToken, enumType) != ('string', self.END):
+                            strToken, enumType = parser.tokens.next()
+                            if (strToken, enumType) != ('string', parser.END):
                                 break
                         else:
                             break
@@ -417,60 +263,37 @@ class ProjectPlan:
         return 'Unparsable input: ' + strToken
     
     def parseAll(self):
-        self.parseStages()
-        self.parseSkipUntil('BasePlanName', self.BEGIN)
-        self.basePlanName = self.parseGetCData()
+        parser = XMLParser(self.path)
+        self.parseStages(parser)
+        parser.parseSkipUntil('BasePlanName', parser.BEGIN)
+        self.basePlanName = parser.parseGetCData()
         
-    def parseStages(self):
+    def parseStages(self, parser):
         """Parses <Stages> to </Stages> and stores a list of stages in
         self.listStages. Returns nothing.
         """
-        self.parseSkipUntil('Stages', self.BEGIN)
+        parser.parseSkipUntil('Stages', parser.BEGIN)
         iCount = 0
         while True:
-            strToken, enumType = self.tokens.next()
-            if enumType == self.EOF:
+            strToken, enumType = parser.tokens.next()
+            if enumType == parser.EOF:
                 break;
-            if (strToken, enumType) == ('Stage', self.BEGIN):
+            if (strToken, enumType) == ('Stage', parser.BEGIN):
                 aStage = Stage()
                 iCount += 1
                 aStage.number = iCount
-                aStage.parseStage(self)
+                aStage.parseStage(self, parser)
                 aStage.summarizeChecks()
                 self.listStages.append(aStage) # up thru </Stage>
-            elif (strToken, enumType) == ('Stages', self.END):
+            elif (strToken, enumType) == ('Stages', parser.END):
                 break   #All Done
-            
-
-    def parseSkipUntil(self, strTagName, enumTagType):
-        while True:
-            strToken, enumType = self.tokens.next()
-            if (strToken, enumType) == (strTagName, enumTagType):
-                return
-            elif enumType == self.EOF:
-                return
-            
-   
-    def parseCheck(self):
+              
+    def parseCheck(self, parser):
         """Returns a Check. 
         """
         aCheck = Check()
-        aCheck.parseCheck(self)
+        aCheck.parseCheck(parser)
         return aCheck
-    
-    
-    
-    def parseGetCData(self):
-        """ Reads one CDATA token and one end tag token and returns the CDATA."""
-        strToken, enumType = self.tokens.next()
-        if enumType == self.ATTRS:
-            strToken, enumType = self.tokens.next() #ignore ATTRs
-        if enumType == self.END:
-            return ''
-        elif enumType == self.CDATA:
-            strCdata = strToken
-            strToken, enumType = self.tokens.next() # presumably an end tag
-            return strCdata
 
     def quickReport(self):
         pass
