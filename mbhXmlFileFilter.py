@@ -14,7 +14,7 @@ if __name__=="__main__":
     optxfScopeElement = 'item'
 #     optxfXmlFileName = 'Lexicon.xml'
     optxfXmlFileName = "C:\My Paratext 8 Projects\_StandardPlans\SIL Compact Plan - Rev 1.xml"
-    optxfAcceptFilter = r">en<"
+    optxfAcceptFilter = r""
     optxfRejectFilter = r""
     optxfSearchRegex = r"\btext\b"
     optxfReplaceRegex = r"story"
@@ -24,9 +24,22 @@ if __name__=="__main__":
 def main(xml):
     listScopes = getScopes(xml)
     
-    patAccept = re.compile(optxfAcceptFilter) if optxfAcceptFilter else None
-    patReject = re.compile(optxfRejectFilter) if optxfRejectFilter else None
-    patSearch = re.compile(optxfSearchRegex) if optxfSearchRegex else None
+    try:
+        patAccept = re.compile(optxfAcceptFilter) if optxfAcceptFilter else None
+    except:
+        say("Invalid Accept Filter Regex: %s\n" % optxfAcceptFilter)
+        return
+    
+    try:
+        patReject = re.compile(optxfRejectFilter) if optxfRejectFilter else None
+    except:
+        say("Invalid Reject Filter Regex: %s\n" % optxfRejectFilter)
+        return
+    try:
+        patSearch = re.compile(optxfSearchRegex) if optxfSearchRegex else None
+    except:
+        say("Invalid Search Regex: %s\n" % optxfSearchRegex)
+        return
     
     for S in listScopes:
         blnAccept = applyRegex(S.text, patAccept) if patAccept else True
@@ -49,9 +62,14 @@ class XmlText:
         else:
             strFile = os.path.join(SettingsDirectory, Project, filename)
             
-        fileXML = codecs.open(strFile, 'r', 'utf_8')
-        self.text = fileXML.read()
-        fileXML.close()
+        try:
+            fileXML = codecs.open(strFile, 'r', 'utf_8')
+            self.text = fileXML.read()
+            fileXML.close()
+        except IOError:
+            say("Cannot open file: %s\n" % strFile)
+            self.text = ''
+            return
 
         self.hasBOM = True if self.text[0] == u'\uFEFF' else False
         
@@ -137,21 +155,23 @@ def cms():
     global TESTMODE
     TESTMODE = False
     xml = XmlText(optxfXmlFileName)
-    sys.stdout = codecs.open(OutputFile,'w', xml.encoding())
-    try:
-        main(xml)
-    except:
-        sys.stdout.flush()
-        sys.stdout.close()
-        raise
+    if xml.text:
+        sys.stdout = codecs.open(OutputFile,'w', xml.encoding())
+        try:
+            main(xml)
+        except:
+            sys.stdout.flush()
+            sys.stdout.close()
+            raise
 
 def test():
     global TESTMODE, FileProxyStdout
     TESTMODE = True
     xml = XmlText(optxfXmlFileName)
-    FileProxyStdout = codecs.open(OutputFile,'w', xml.encoding())
-    main(xml)
-    FileProxyStdout.close()
+    if xml.text:
+        FileProxyStdout = codecs.open(OutputFile,'w', xml.encoding())
+        main(xml)
+        FileProxyStdout.close()
     
 
 def writeout(strText):
