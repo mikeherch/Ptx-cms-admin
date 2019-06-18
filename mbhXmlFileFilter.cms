@@ -1,0 +1,30 @@
+\check XML File Filter
+\subMenu Admin
+\description Filters an XML file by applying regular expressions, and optionally preforms search and replace on the filtered results. The results appear in a text file, that the user can save as an XML file.
+\script mbhXmlFileFilter.py
+\toText
+\utf8
+
+\optionName optxfScopeElement
+\optionLocalizedName Scope Element
+\optionDescription XML tag name that specifies the element(s) that will be affected by the filter(s).
+
+\optionName optxfXmlFileName
+\optionLocalizedName XML File Name
+\optionDescription Name of XML file to filter.
+
+\optionName optxfAcceptFilter
+\optionLocalizedName Accept Filter Regex
+\optionDescription An optional regular expression that will be applied to the scope elements. If the regex matches, the element will be passed to the output file.
+
+\optionName optxfRejectFilter
+\optionLocalizedName Reject Filter Regex
+\optionDescription An optional regular expression that will be applied to the scope elements. If the regex matches, the element will be NOT passed to the output file.
+
+\optionName optxfSearchRegex
+\optionLocalizedName Search Regex
+\optionDescription An optional regular expression that works in conjunction with the Replace Regex. It will be applied to the scope elements that have passed the accept and reject filters. If a match occurs, the Replace Regex will be applied to the matched text.
+
+\optionName optxfReplaceRegex
+\optionLocalizedName Replace Expression
+\optionDescription An optional replace expression that works in conjunction with the Search Regex. The Replace Regex will be applied to text that is matched by the Search Regex.
