@@ -5,21 +5,26 @@
 \toText
 \utf8
 
-\optionName optxfScopeElement
-\optionLocalizedName Scope Element
-\optionDescription XML tag name that specifies the element(s) that will be affected by the filter(s).
-
 \optionName optxfXmlFileName
 \optionLocalizedName XML File Name
 \optionDescription Name of XML file to filter.
 
+\optionName optxfScopeElement
+\optionLocalizedName Scope Element
+\optionDescription XML tag name that specifies the element(s) that will be affected by the filter(s).
+
+\optionName optxfScopeOnly
+\optionLocalizedName Keep Only Scope Elements
+\optionDescription Enter YES and only scope elements will be passed to the output. Enter NO and both scope and non-scope elements will be passed to the output.
+\optionDefault NO
+
 \optionName optxfAcceptFilter
 \optionLocalizedName Accept Filter Regex
-\optionDescription An optional regular expression that will be applied to the scope elements. If the regex matches, the element will be passed to the output file.
+\optionDescription An optional regular expression that will be applied to the scope elements. If the regex matches, the element will be passed to the output.
 
 \optionName optxfRejectFilter
 \optionLocalizedName Reject Filter Regex
-\optionDescription An optional regular expression that will be applied to the scope elements. If the regex matches, the element will be NOT passed to the output file.
+\optionDescription An optional regular expression that will be applied to the scope elements. If the regex matches, the element will be NOT passed to the output.
 
 \optionName optxfSearchRegex
 \optionLocalizedName Search Regex

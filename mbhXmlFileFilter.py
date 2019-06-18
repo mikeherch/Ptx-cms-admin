@@ -14,6 +14,7 @@ if __name__=="__main__":
     optxfScopeElement = 'item'
 #     optxfXmlFileName = 'Lexicon.xml'
     optxfXmlFileName = "C:\My Paratext 8 Projects\_StandardPlans\SIL Compact Plan - Rev 1.xml"
+    optxfScopeOnly = 'Y'
     optxfAcceptFilter = r""
     optxfRejectFilter = r""
     optxfSearchRegex = r"\btext\b"
@@ -22,6 +23,7 @@ if __name__=="__main__":
     Encoding = "65001"
     
 def main(xml):
+    blnScopeOnly = optxfScopeOnly.upper() in ['Y', 'YES', 'T', 'TRUE']
     listScopes = getScopes(xml)
     
     try:
@@ -44,7 +46,10 @@ def main(xml):
     for S in listScopes:
         blnAccept = applyRegex(S.text, patAccept) if patAccept else True
         blnReject = applyRegex(S.text, patReject) if patReject else False
-         
+        
+        if blnScopeOnly:
+            S.textBefore = ""
+            
         if blnAccept and not blnReject:
             if patSearch:
                 strNew = re.sub(patSearch, optxfReplaceRegex, S.text)
