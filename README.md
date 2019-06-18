@@ -15,6 +15,10 @@ python API.
   * Lexicon Export As SFM - This app will display a report in the user's default text editor showing the
     contents of a project's interlinear lexicon, Lexicon.xml, in SFM format. The report can be saved as a
     file and imported into Flex.
+  * XML File Filter (beta) - Filters an XML file by applying regular expressions, and optionally preforms  
+    search and replace on the filtered results. The results appear in a text file, that the user can save as 
+    an XML file. This app was designed for use by Paratext support personnel. THIS IS A BETA! The script lacks 
+    internal error checking.
  
 To install:
 * Close Paratext application
@@ -24,4 +28,5 @@ the path is C:\My Paratext 8 Projects\cms\.
 To execute any CMS app:
 * Start Paratext application
 * Open a project
-* From the menu choose: Checking > Advanced > Admin, and then choose one of the apps
+* From the Paratext 8 menu choose: Checking > Advanced > Admin, and then choose one of the apps;
+  from the Paratext 9 project menu choose: Custom tools > Admin, and then choose one of the apps.
