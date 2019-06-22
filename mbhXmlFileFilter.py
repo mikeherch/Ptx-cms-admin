@@ -7,18 +7,20 @@ import sys
 import re 
 import codecs
 import os.path
+import StringIO
 
 if __name__=="__main__":
     SettingsDirectory = "C:\\My Paratext 8 Projects\\"
     Project = "zzAkgUni"
     optxfScopeElement = 'item'
 #     optxfXmlFileName = 'Lexicon.xml'
-    optxfXmlFileName = "C:\My Paratext 8 Projects\_StandardPlans\SIL Compact Plan - Rev 1.xml"
+#     optxfXmlFileName = r"..\_StandardPlans\SIL Compact Plan - Rev 1.xml"
+    optxfXmlFileName = r"Interlinear_en\Interlinear_en_MAT.xml"
     optxfScopeOnly = 'Y'
     optxfAcceptFilter = r""
     optxfRejectFilter = r""
-    optxfSearchRegex = r"\btext\b"
-    optxfReplaceRegex = r"story"
+    optxfSearchRegex = r"C:\Dox\Temp\regexTest.txt"
+    optxfReplaceRegex = r""
     OutputFile = SettingsDirectory + "cms\\checktext.txt"
     Encoding = "65001"
     
@@ -37,11 +39,19 @@ def main(xml):
     except:
         say("Invalid Reject Filter Regex: %s\n" % optxfRejectFilter)
         return
-    try:
-        patSearch = re.compile(optxfSearchRegex) if optxfSearchRegex else None
-    except:
-        say("Invalid Search Regex: %s\n" % optxfSearchRegex)
-        return
+    
+    if optxfSearchRegex:
+        if os.path.exists(optxfSearchRegex):
+            listSearchReplace =  parseRegexFile(optxfSearchRegex)
+        else:
+            try:
+                patSearch = re.compile(optxfSearchRegex)
+            except:
+                say("Invalid Search Regex: %s\n" % optxfSearchRegex)
+                return
+            listSearchReplace = [patSearch, optxfReplaceRegex]
+    else:
+        listSearchReplace = None
     
     for S in listScopes:
         blnAccept = applyRegex(S.text, patAccept) if patAccept else True
@@ -51,9 +61,11 @@ def main(xml):
             S.textBefore = ""
             
         if blnAccept and not blnReject:
-            if patSearch:
-                strNew = re.sub(patSearch, optxfReplaceRegex, S.text)
-                S.text = strNew
+            if listSearchReplace:
+                strNew = S.text
+                for patSearch, strReplace in listSearchReplace:
+                    strNew = re.sub(patSearch, strReplace, strNew)
+                    S.text = strNew
             writeout(S.textBefore + S.indent + S.text + S.eol)
         else:
             writeout(S.textBefore)
@@ -64,8 +76,12 @@ class XmlText:
         
         if os.path.exists(filename):
             strFile = filename
+        elif filename[0:3] == "..\\":
+            strFile = os.path.join(SettingsDirectory, filename[3:])
         else:
             strFile = os.path.join(SettingsDirectory, Project, filename)
+            
+        strFile = os.path.realpath(strFile)
             
         try:
             fileXML = codecs.open(strFile, 'r', 'utf_8')
@@ -155,6 +171,33 @@ def getScopes(xml):
     lastS.textBefore = xml.text[iStart:]
     aList.append(lastS)
     return aList
+
+def parseRegexFile(path):
+    """ Sample regex file to be parsed:
+    # This is a comment
+        "search pattern1"  >  "replace pattern1"    # comment
+        '\s*(abc|xyz)'     >  'stuff \1'            # delimiters either " or '
+    """
+    try:
+        aFile = codecs.open(path, 'r', 'utf-8-sig')
+    except:
+        raise
+    
+    listRegex = []
+    strEntire = aFile.read()
+    aStream = StringIO.StringIO(strEntire)
+    for strLine in aStream:
+        if not strLine: continue  
+        if strLine[0] == "#": continue
+        m = re.match(r"\s*([\"\'])(.+?)\1\s+>\s+([\"\'])(.+?)\3\s*(#.*)?", strLine)
+        if m:
+            strSearch = m.group(2)
+            aPattern = re.compile(strSearch)
+            strReplace = m.group(4)
+            listRegex.append((aPattern, strReplace))
+        else:
+            say("Invalid syntax in %s: \n   %s\n" % (path,strLine))
+    return listRegex
 
 def cms():
     global TESTMODE

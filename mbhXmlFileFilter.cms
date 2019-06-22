@@ -4,6 +4,7 @@
 \script mbhXmlFileFilter.py
 \toText
 \utf8
+\helpFile mbhXmlFileFilter.rtf
 
 \optionName optxfXmlFileName
 \optionLocalizedName XML File Name
